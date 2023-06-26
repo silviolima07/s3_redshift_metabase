@@ -1,0 +1,39 @@
+
+Nas tabelas onde não tem data o dateformat não é usado.
+
+
+COPY ed.public.clientes(idcliente, cliente, estado, sexo, status) FROM 's3://fa-ed/clientes.csv' IAM_ROLE 'arn:aws:iam::584115262809:role/role-s3-to-redshift-and-vice-versa' FORMAT AS CSV DELIMITER ';' QUOTE '"' IGNOREHEADER 1 REGION AS 'sa-east-1' DATEFORMAT 'DD-MM-YYYY';
+
+COPY ed.public.itensvenda FROM 's3://fa-ed/itensvenda.csv' IAM_ROLE 'arn:aws:iam::584115262809:role/role-s3-to-redshift-and-vice-versa' FORMAT AS CSV DELIMITER ';' QUOTE '"' IGNOREHEADER 1 REGION AS 'sa-east-1' DATEFORMAT 'DD-MM-YYYY';
+
+COPY ed.public.produtos FROM 's3://fa-ed/produtos.csv' IAM_ROLE 'arn:aws:iam::584115262809:role/role-s3-to-redshift-and-vice-versa' FORMAT AS CSV DELIMITER ';' QUOTE '"' IGNOREHEADER 1 REGION AS 'sa-east-1' DATEFORMAT 'DD-MM-YYYY';
+
+
+COPY ed.public.vendedores FROM 's3://fa-ed/vendedores.csv' IAM_ROLE 'arn:aws:iam::584115262809:role/role-s3-to-redshift-and-vice-versa' FORMAT AS CSV DELIMITER ';' QUOTE '"' IGNOREHEADER 1 REGION AS 'sa-east-1' DATEFORMAT 'DD-MM-YYYY';
+
+Na tabela vendas o campo data existe e tem uma formatação usando '/' e não '-'
+
+COPY vendas FROM 's3://fa-ed/vendas.csv'IAM_ROLE 'arn:aws:iam::584115262809:role/role-s3-to-redshift-and-vice-versa' FORMAT AS CSV DELIMITER ';' IGNOREHEADER 1 REGION 'sa-east-1'DATEFORMAT 'DD/MM/YYYY';
+
+select * from sys_load_error_detail;
+
+
+======================================================
+
+select cliente, data, nome as vendedor, produto, quantidade, total
+from vendas v
+inner join clientes c on (c.idcliente = v.idcliente)
+inner join itensvenda i on (i.idvenda = v.idvenda)
+inner join produtos p on (p.idproduto = i.idproduto)
+inner join vendedores vd on (vd.IDVendedor = v.IDVendedor)
+
+--------------------------
+select cliente, data, nome as vendedor, produto, quantidade, total
+into fatovendas
+from vendas v
+inner join clientes c on (c.idcliente = v.idcliente)
+inner join itensvenda i on (i.idvenda = v.idvenda)
+inner join produtos p on (p.idproduto = i.idproduto)
+inner join vendedores vd on (vd.IDVendedor = v.IDVendedor)
+
+

@@ -1,0 +1,15 @@
+S3 + Redshift + Metabase
+
+1) Foi feito upload de 5 tabelas csv num bucket criado na AWS.
+   Tabelas: clientes, itensvendas, produtos, vendas e vendedores.
+
+2) Na AWS no serviço Redshift Serverless é concedido um crédito de 300 dolares, com tempo de válidade do crédito. Foi criado um workgroup iniciando pelo namespace chamado ns-vendas. Um usuário com poderes de admin (awsuser) foi criado, a senha deve ser anotada. Uma role com poderes de executar Copy nos buckets deve ser associada a este workgroup. Já existe uma role preparada pra isso basta associar ao ns-vendas. Eu criei e associada um role com acesso full ao redshift e s3. Usei as duas roles na demo. Talvez a role já preparada basta.
+
+3) Um workgroup chamado wg-vendas foi criado. Foram usadas as configurações default para a VPC e subnets criaadas. A informação do Endpoint e da url jdbc são usadas na conexão via uma feramenta de visualização como o Looker, Power BI ou Metabase. Ou para testar o acesso via dbeaver. Ao final, na aba Network and Security, podemos habilitar o acesso público para que as tabelas possam ser acessadas por uma ferramenta de visualização como o Power BI ou o Looker. Nessa demo foi usado o Metabase. Foi feito um teste de acesso as tabelas e foi preciso criar uma nova rule no security group da VPC. Em inbound rule, foi incluida a permissão de acesso All Trafic from myIP. Apenas com rule existente não deu certo. O problema poderia ser outro, mas dessa forma a conexão esta ok e segura também.
+
+4) Após a criação do workgroup, abrir o Editor de Query.
+   Foi criado um database vendas com schema public. Nele foram executadas os códigos SQL e as 5 tabelas criadas. Em seguida foram copiados os conteúdos das planilhas csv, presentes no bucket, para as respectivas tabelas no database vendas.
+   
+5) As 5 tabelas foram usadas para criar a tabela fatovendas, a partir do comando select trazendo algumas colunas das 5 tabelas filtradas via inner join. Esta tabela será usada na criação de gráficos de vendas.
+
+6) No Metabase foi criada a conexão com o Redshift informando o Endpoint do workgroup e o database criado, vendas. Feita a conexão, a tabela fatovendas foi selecionada e foram criados dois gráficos. Um gráfico de barras mostrando a quantidade de vendas por vendedor, um gráfico de linhas mostrando a evolução das vendas no periodo de tempo dos dados disponíveis e um cartão mostrando o valor total das vendas de todos produtos. Um filtro foi criado para permitir a visualização da performance dos vendedores.
